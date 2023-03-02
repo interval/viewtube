@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Video {
+  id            String          @id @default(uuid())
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  title         String
+  thumbnailUrl  String
+  url           String
+  price         Int
+  published     Boolean         @default(false)
+  channel       Channel         @relation(fields: [channelId], references: [id])
+  channelId     String
+  comments      UserComment[]
+  VideoPurchase VideoPurchase[]
+}
+
+model VideoPurchase {
+  id        String   @id @default(uuid())
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  video     Video    @relation(fields: [videoId], references: [id])
+  videoId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
+}
+
+model Channel {
+  id      String  @id @default(uuid())
+  name    String
+  owner   User    @relation(fields: [ownerId], references: [id])
+  ownerId String
+  videos  Video[]
+}
+
+model UserComment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  isSpam    Boolean  @default(false)
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+}
+
+model User {
+  id                String          @id @default(uuid())
+  email             String          @unique
+  name              String?
+  imageUrl          String?
+  canUpload         Boolean         @default(false)
+  isVerified        Boolean         @default(false)
+  maxUploadDuration Int             @default(600)
+  signedUpAt        DateTime
+  comments          UserComment[]
+  channels          Channel[]
+  VideoPurchase     VideoPurchase[]
+}

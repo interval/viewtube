@@ -1,0 +1,6 @@
+prisma/.env
+.env
+env.ts
+node_modules
+.DS_Store
+yarn-error.log

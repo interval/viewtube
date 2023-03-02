@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>ViewTube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+
+      .inset {
+        width: 100%;
+        max-width: 1024px;
+        margin: auto;
+        padding-left: 24px;
+        padding-right: 24px;
+        box-sizing: border-box;
+        display: block;
+      }
+
+      header {
+        width: 100%;
+        height: 64px;
+        padding: 8px;
+        box-sizing: border-box;
+        border-bottom: 1px solid #e4e3e3;
+        display: flex;
+        justify-items: center;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      img {
+        max-width: 100%;
+        border-radius: 12px;
+      }
+
+      #logo {
+        font-weight: bold;
+        font-size: 26px;
+      }
+
+      ul,
+      li {
+        list-style: none;
+        padding: 0;
+        padding-bottom: 12px;
+      }
+
+      h4 {
+        margin: 0;
+      }
+
+      .comment-body {
+        margin-bottom: 8px;
+      }
+
+      .flag {
+        color: maroon;
+        font-size: 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+
+      .flag:hover {
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="inset">
+        <a href="/">
+          <div id="logo">ViewTube</div>
+        </a>
+      </div>
+    </header>
+    <div class="inset">
+      <h1><%=video.title %></h1>
+      <img src="<%=video.thumbnailUrl %>" />
+      <h3>Comments</h3>
+      <ul>
+        <% video.comments.forEach(function(comment){ %>
+        <li>
+          <h4><%= comment.author.name || comment.author.email %></h4>
+          <div class="comment-body"><%= comment.content %></div>
+          <div class="flag" id="<%= comment.id %>">Flag as spam</div>
+        </li>
+        <% }); %>
+      </ul>
+    </div>
+  </body>
+  <script>
+    Array.from(document.querySelectorAll(".flag")).forEach((el) => {
+      el.addEventListener("click", async (evt) => {
+        const isConfirmed = window.confirm(
+          "Are you sure you want to flag this comment as spam?"
+        );
+        if (!isConfirmed) return;
+        const json = await fetch(`/comment/flag/${evt.target.id}`, {
+          method: "POST",
+        }).then((r) => r.json());
+        console.log("json", json);
+        evt.target.innerHTML = "Flagged!";
+      });
+    });
+  </script>
+</html>
