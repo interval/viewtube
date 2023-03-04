@@ -237,7 +237,7 @@ const singleUser = async (userId: string) => {
 };
 
 export default new Page({
-  name: "Users",
+  name: "👥 Users",
   handler: async () => {
     const { userId } = z
       .object({ userId: z.string().optional() })
