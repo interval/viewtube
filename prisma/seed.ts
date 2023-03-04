@@ -1,28 +1,28 @@
 import { PrismaClient } from "@prisma/client";
 import { v4 } from "uuid";
 import { faker } from "@faker-js/faker";
-import fakeUsers from "./fakeUsers";
 
 const prisma = new PrismaClient();
 
-function profPicUrl(name: string) {
+function profPicUrl() {
   return faker.image.avatar();
-}
-
-function upperFirst(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 async function addFakeUsers() {
   await prisma.user.createMany({
-    data: fakeUsers.map((fu) => ({
-      signedUpAt: faker.date.between("2020-01-01", new Date()),
-      name: `${upperFirst(fu.first_name)} ${upperFirst(fu.last_name)}`,
-      email: fu.email,
-      canUpload: false,
-      imageUrl: profPicUrl(fu.first_name + fu.last_name),
-      isVerified: faker.datatype.number({ min: 0, max: 100 }) > 70,
-    })),
+    data: new Array(200).fill(null).map(() => {
+      const firstName = faker.name.firstName();
+      const lastName = faker.name.lastName();
+
+      return {
+        signedUpAt: faker.date.between("2020-01-01", new Date()),
+        name: `${firstName} ${lastName}`,
+        email: faker.internet.exampleEmail(firstName, lastName),
+        canUpload: faker.datatype.number({ min: 0, max: 100 }) > 50,
+        imageUrl: profPicUrl(),
+        isVerified: faker.datatype.number({ min: 0, max: 100 }) > 70,
+      };
+    }),
   });
 }
 
@@ -39,7 +39,7 @@ async function main() {
       name: "Alex Arena",
       email: "im@alexarena.com",
       canUpload: false,
-      imageUrl: profPicUrl("Alex Arena"),
+      imageUrl: profPicUrl(),
     },
   });
 
@@ -48,17 +48,29 @@ async function main() {
       signedUpAt: faker.date.between("2020-01-01", new Date()),
       name: "Kyle Sanok",
       email: "ksanok10@gmail.com",
-      imageUrl: profPicUrl("Kyle Sanok"),
+      imageUrl: profPicUrl(),
       canUpload: false,
     },
   });
 
-  const amelia = await prisma.user.findUnique({
-    where: { email: "amelia.mercier@example.com" },
+  const amelia = await prisma.user.create({
+    data: {
+      signedUpAt: faker.date.between("2020-01-01", new Date()),
+      name: "Amelia Mercier",
+      email: "amelia.mercier@example.com",
+      imageUrl: profPicUrl(),
+      canUpload: false,
+    },
   });
 
-  const sarah = await prisma.user.findUnique({
-    where: { email: "sarah.oliver@example.com" },
+  const sarah = await prisma.user.create({
+    data: {
+      signedUpAt: faker.date.between("2020-01-01", new Date()),
+      name: "Sarah Oliver",
+      email: "sarah.oliver@example.com",
+      imageUrl: profPicUrl(),
+      canUpload: false,
+    },
   });
 
   if (!amelia || !sarah) throw new Error("Missing users");
