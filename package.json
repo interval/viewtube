@@ -21,12 +21,15 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.294.0",
+    "@aws-sdk/s3-request-presigner": "^3.294.0",
     "@interval/fake-stripe": "^1.0.2",
     "@interval/sdk": "^0.38.0-dev1",
     "@prisma/client": "4",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.6",
     "express": "^4.17.3",
+    "is-image": "^3.1.0",
     "openai": "^3.2.1",
     "prisma": "4",
     "uuid": "^8.3.2",

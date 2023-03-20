@@ -1,13 +1,10 @@
 import os from "os";
 import { io, Layout, Page } from "@interval/sdk";
+import { toMb } from "../../helpers/toMb";
 
 /*
     If your Interval tools run in the same process as your main application, you can directly query for system information like RAM usage, making Interval a powerful tool for sysadmin tasks including debugging and troubleshooting.
 */
-
-function toMb(bytes: number) {
-  return `${(bytes / (1024 * 1024)).toFixed(2)}mb`;
-}
 
 // Info about the Node.js process
 function processInfo() {
