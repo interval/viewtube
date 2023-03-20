@@ -20,6 +20,7 @@ export async function requireUser() {
                 contains: query,
               },
             },
+            // Important! If you don't specify a limit, your ORM may return a _really_ large result set which can impact your tool's performance and/or unnecessarily tax your database.
             take: 10,
           });
           return users;
