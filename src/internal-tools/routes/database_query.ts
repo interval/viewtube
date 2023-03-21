@@ -3,7 +3,7 @@ import { Action, io } from "@interval/sdk";
 import { prisma } from "../../database";
 
 export default new Action({
-  name: "🗂️ Natural language database query",
+  name: "🗂️ AI-powered database query",
   description: `Answer questions about ViewTube data with help from OpenAI`,
   handler: async () => {
     if (!process.env.OPENAI_API_KEY) {
