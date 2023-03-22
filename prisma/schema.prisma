@@ -66,3 +66,18 @@ model User {
   channels          Channel[]
   VideoPurchase     VideoPurchase[]
 }
+
+model FeatureFlag {
+  slug                String           @id
+  description         String?
+  isEnabled           Boolean          @default(false)
+  rolloutPercentage   Int              @default(100)
+  enabledEnvironments AppEnvironment[] @default([STAGING, PRODUCTION])
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @default(now()) @updatedAt
+}
+
+enum AppEnvironment {
+  STAGING
+  PRODUCTION
+}

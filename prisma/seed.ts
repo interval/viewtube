@@ -30,6 +30,32 @@ const randomElement = <T>(arr: T[]) =>
   arr[Math.floor(Math.random() * arr.length)];
 
 async function main() {
+  await prisma.featureFlag.createMany({
+    data: [
+      {
+        slug: "HIDE_COMMENT_COUNT",
+        description: `Hides the comment count on new videos`,
+        isEnabled: true,
+      },
+      {
+        slug: "SHOW_VERIFICATION_BADGES",
+        description: `Shows verification badges on user profiles`,
+        isEnabled: true,
+        rolloutPercentage: 50,
+      },
+      {
+        slug: "ANYONE_CAN_UPLOAD",
+        description: `Enables uploading for any user account`,
+        enabledEnvironments: ["STAGING"],
+        isEnabled: true,
+      },
+      {
+        slug: "ENABLE_SPAM_REPORTING",
+        description: `Allows end-users to report comments as spam`,
+      },
+    ],
+  });
+
   await addFakeUsers();
 
   const alex = await prisma.user.create({
