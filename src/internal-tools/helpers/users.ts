@@ -2,6 +2,51 @@ import { ctx, io } from "@interval/sdk";
 import { z } from "zod";
 import { prisma } from "../../database";
 
+export async function basicUserDetails() {
+  const { email, name } = z
+    .object({
+      name: z.string().optional(),
+      email: z.string().optional(),
+    })
+    .parse(ctx.params);
+
+  let response = {
+    email,
+    name,
+  }
+
+  if (!email || !name) {
+    response = await io.group({
+      name: io.input.text("Name", {defaultValue: name}),
+      email: io.input.email("Email", {defaultValue: email}),
+    })
+  }
+
+  return {
+    email: response.email as string,
+    name: response.name as string,
+  }
+}
+
+export async function additionalUserDetails() {
+  const [_, birthday, website, profileText] = await io.group([
+    io.display.markdown(`
+          ## Basic info
+      `),
+    io.input.date("Birthday"),
+    io.input.url("Website"),
+    io.input.richText("Profile", {
+      helpText: "This formatted text will be shown on the user's profile page",
+    }),
+  ])
+  return {
+    birthday,
+    website,
+    profileText,
+  }
+}
+
+
 export async function requireUser() {
   const { userId } = z
     .object({

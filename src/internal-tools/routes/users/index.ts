@@ -55,7 +55,7 @@ const allUsers = async () => {
     menuItems: [
       {
         label: "Add user",
-        action: "", // TODO: implement
+        action: "users/onboard",
       },
     ],
     children: [
