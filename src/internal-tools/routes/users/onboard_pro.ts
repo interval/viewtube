@@ -7,6 +7,7 @@ export default new Action({
   unlisted: true,
   handler: async () => {
 
+    // Share Interval components across actions like any shared function
     const { email, name } = await basicUserDetails();
 
     const [_meta, selectedPlans] = await io.group([
@@ -66,7 +67,7 @@ export default new Action({
       },
     });
 
-    // TODO: process images and other data
+    // Process images and other data
 
     await ctx.notify({
       message: `${name} (${email}) has been onboarded by ${ctx.user.email}`,

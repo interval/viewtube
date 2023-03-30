@@ -77,7 +77,35 @@ model FeatureFlag {
   updatedAt           DateTime         @default(now()) @updatedAt
 }
 
+model CustomerSupportTicket {
+  id                  String          @id @default(uuid())
+  title               String
+  status              TicketStatus    @default(OPEN)
+  contactMethod       TicketContactMethod
+  description         String?
+  severity            TicketSeverity?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @default(now()) @updatedAt
+}
+
 enum AppEnvironment {
   STAGING
   PRODUCTION
+}
+
+enum TicketSeverity {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+enum TicketContactMethod {
+  EMAIL
+  CHAT
+  PHONE
 }

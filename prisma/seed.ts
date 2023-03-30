@@ -26,6 +26,22 @@ async function addFakeUsers() {
   });
 }
 
+const contactMethods = ["EMAIL", "PHONE", "CHAT"] as const;
+const severities = ["HIGH", "MEDIUM", "LOW"] as const;
+
+async function addFakeSupportTickets() {
+  await prisma.customerSupportTicket.createMany({
+    data: new Array(20).fill(null).map(() => {
+      return {
+        title: `${faker.helpers.arrayElement(["My", "The"])} ${faker.company.bsNoun()} are not ${faker.company.catchPhraseAdjective().toLowerCase()}`,
+        contactMethod: faker.helpers.arrayElement(contactMethods),
+        severity: faker.helpers.arrayElement(severities),
+        description: faker.lorem.paragraph(),
+      };
+    }),
+  });
+}
+
 const randomElement = <T>(arr: T[]) =>
   arr[Math.floor(Math.random() * arr.length)];
 
@@ -57,6 +73,7 @@ async function main() {
   });
 
   await addFakeUsers();
+  await addFakeSupportTickets();
 
   const alex = await prisma.user.create({
     data: {

@@ -1,6 +1,6 @@
 import { Action, io } from "@interval/sdk";
 import { prisma } from "../../../database";
-import { requireUser } from "../../helpers/requireUser";
+import { requireUser } from "../../helpers/users";
 
 export default new Action({
   name: "User verification",
