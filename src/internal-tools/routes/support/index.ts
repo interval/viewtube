@@ -9,6 +9,9 @@ export default new Page({
 
     // Load any data for rendering within components on the page
     const tickets = await prisma.customerSupportTicket.findMany({
+      where: {
+        status: "OPEN",
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -86,13 +89,8 @@ export default new Page({
         io.display.heading("Open tickets", {
           menuItems: [
             {
-              label: "Create ticket",
-              action: "users/add_note",
-              theme: "primary",
-            },
-            {
               label: "Create incident",
-              action: "support/escalate_tickets",
+              url: "https://example.com/incident/create",
               theme: "danger",
             },
             {
@@ -107,33 +105,19 @@ export default new Page({
         }),
         io.display.table("Tickets", {
           data: tickets,
-          columns: ["title", "severity", "status", "createdAt"],
+          columns: ["id", "title", "severity", "contactMethod", "status", "createdAt"],
           rowMenuItems: row => [
             {
               label: "Close",
               action: "support/close_ticket",
               theme: "danger",
+              params: {
+                ticketId: row.id,
+              },
             },
           ],
         }),
       ],
     });
   },
-  routes: {
-    responses: {
-      name: "Response templates",
-      handler: async () => {
-      },
-    },
-    create: {
-      name: "Search docs",
-      handler: async () => {
-      },
-    },
-    past_issues: {
-      name: "My resolved issues",
-      handler: async () => {
-      },
-    },
-  }
 });

@@ -65,7 +65,19 @@ model User {
   comments          UserComment[]
   channels          Channel[]
   VideoPurchase     VideoPurchase[]
+  notes             UserNote[]
 }
+
+model UserNote {
+  id          String   @id @default(uuid())
+  content     String
+  authorEmail String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
 
 model FeatureFlag {
   slug                String           @id
