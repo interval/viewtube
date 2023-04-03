@@ -24,7 +24,7 @@
     "@aws-sdk/client-s3": "^3.294.0",
     "@aws-sdk/s3-request-presigner": "^3.294.0",
     "@interval/fake-stripe": "^1.0.2",
-    "@interval/sdk": "^0.38.0-dev1",
+    "@interval/sdk": "^1.0.0-dev0",
     "@prisma/client": "4",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.6",

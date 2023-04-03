@@ -5,6 +5,9 @@
     "strict": true,
     "noImplicitAny": false,
     "lib": ["esnext", "dom"],
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules"]
 }
