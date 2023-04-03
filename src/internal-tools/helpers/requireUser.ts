@@ -33,14 +33,5 @@ export async function requireUser() {
         },
       });
 
-  await io.display.metadata(`User`, {
-    layout: "list",
-    //@ts-ignore
-    data: Object.entries(user).map(([k, v]) => ({
-      label: k,
-      value: v,
-    })),
-  });
-
   return user;
 }

@@ -7,21 +7,27 @@ export default new Action({
   unlisted: true,
   handler: async () => {
     const user = await requireUser();
-    const action = await io.select.single("Action", {
-      defaultValue: "Check verification status",
-      options: [
-        "Remove verification",
-        "Start verification",
+    const { choice } = await io.display
+      .metadata(`User`, {
+        layout: "list",
+        //@ts-ignore
+        data: Object.entries(user).map(([k, v]) => ({
+          label: k,
+          value: v,
+        })),
+      })
+      .withChoices([
         "Check verification status",
-      ],
-    });
+        "Start verification",
+        "Remove verification",
+      ]);
 
-    if (action === "Check verification status") {
+    if (choice === "Check verification status") {
       return `User ${user.email} ${
         user.isVerified ? "IS" : "IS NOT"
       } verified.`;
     }
-    if (action === "Start verification") {
+    if (choice === "Start verification") {
       const [, isReady] = await io.group([
         io.display.markdown(`
             ## Verifying ${user.name}
@@ -61,7 +67,7 @@ export default new Action({
       return `Verified ${user.name}.`;
     }
 
-    if (action === "Remove verification") {
+    if (choice === "Remove verification") {
       const isConfirmed = await io.confirm("Remove verification?", {
         helpText: `User: ${user.name} (${user.email})`,
       });
