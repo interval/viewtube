@@ -1,9 +1,9 @@
 import { Configuration, OpenAIApi } from "openai";
-import { Action, io } from "@interval/sdk";
+import { Action, ctx, io } from "@interval/sdk";
 import { prisma } from "../../database";
 
 export default new Action({
-  name: "🗂️ AI-powered database query",
+  name: "🗂️ AI database query",
   description: `Answer questions about ViewTube data with help from OpenAI`,
   handler: async () => {
     if (!process.env.OPENAI_API_KEY) {
@@ -11,7 +11,6 @@ export default new Action({
         `This action requires the OPENAI_API_KEY environment variable to be set.`
       );
     }
-
     const result = await prisma.$queryRawUnsafe<
       {
         table_name: string;
@@ -35,7 +34,7 @@ export default new Action({
     }
 
     const promptLines = [
-      `### Postgres SQL tables, with their properties:`,
+      `Given the following Postgres SQL tables each with the "public" table_schema, with their properties:`,
       "#",
     ];
     for (const [table, props] of Object.entries(tablesWithProps)) {
@@ -45,13 +44,14 @@ export default new Action({
 
     const userQuery = await io.input.text("What do you want to know?", {
       multiline: true,
-      defaultValue:
-        "Select all users who created their accounts after May 2021",
       placeholder:
-        "list departments which employed more than 10 employees in the last 3 months",
+        "List departments which employed more than 10 employees in the last 3 months",
     });
 
-    promptLines.push(`### A query to ${userQuery}`);
+    promptLines.push(`Can you write a query to ${userQuery}`);
+    promptLines.push(
+      'Please make sure to enclose column names that contain uppercase characters in double quotes like this: SELECT "someColumn" from table;'
+    );
     promptLines.push(`SELECT`);
 
     const configuration = new Configuration({
@@ -60,14 +60,17 @@ export default new Action({
     const openai = new OpenAIApi(configuration);
 
     const prompt = promptLines.join(`\n`);
-    await io.display.code(`Generating query using the following prompt:`, {
-      code: prompt,
-      language: "plaintext",
-    });
+    // Uncomment these lines to debug prompt ⬇️
+    // await io.display.code(`Generating query using the following prompt:`, {
+    //   code: prompt,
+    //   language: "plaintext",
+    // });
 
-    const response = await openai.createCompletion({
-      model: "code-davinci-002",
-      prompt,
+    await ctx.loading.start("Generating query...");
+
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [{ content: prompt, role: "user" }],
       temperature: 0,
       max_tokens: 150,
       top_p: 1.0,
@@ -76,11 +79,16 @@ export default new Action({
       stop: ["#", ";"],
     });
 
-    const aiQuery = `SELECT ${response.data.choices[0].text}`.trim();
+    const aiQuery =
+      `SELECT ${response.data.choices[0].message?.content}`.trim();
 
-    await io.display.code("Executing query:", {
-      code: aiQuery,
-    });
+    const { choice } = await io.display
+      .markdown(["**Query to execute:**", "`" + aiQuery + "`"].join("\n"))
+      .withChoices(["Execute query", "Cancel"]);
+
+    if (choice !== "Execute query") {
+      return;
+    }
 
     const aiQueryResult = await prisma.$queryRawUnsafe<any[]>(aiQuery);
 
