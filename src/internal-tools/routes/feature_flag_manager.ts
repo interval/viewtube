@@ -12,7 +12,7 @@ import { FeatureFlag } from "@prisma/client";
 import { prisma } from "../../database";
 
 function boolToEmoji(someBool: boolean) {
-  return someBool ? "✅" : "❌";
+  return someBool ? "✓" : "⨉";
 }
 
 const sharedColumns = [
@@ -87,12 +87,30 @@ export default new Action({
         })
     ).flat()[0];
 
+    const d = Object.entries(selectedFlag)
+      .filter((ent) => ent[0] !== "slug")
+      .map(([k, v]) => ({
+        label: k,
+        value: JSON.stringify(v),
+      })) as any[];
+    console.log("data", d);
+
+    const { choice: newEnabledChoice } = await io.display
+      .metadata(selectedFlag.slug, {
+        data: d,
+        layout: "list",
+      })
+      .withChoices([
+        {
+          label: "Enable",
+
+          value: "Enable",
+        },
+        "Disable",
+      ]);
+
     // We could use io.input.boolean here too!
-    const newEnabledValue =
-      (await io.select.single(`New status for ${selectedFlag.slug}`, {
-        options: ["Enabled", "Disabled"],
-        defaultValue: selectedFlag.isEnabled ? "Enabled" : "Disabled",
-      })) === "Enabled"; // casts "Enabled" | "Disabled" to a boolean
+    const newEnabledValue = newEnabledChoice === "Enable"; // casts "Enable" | "Disable" to a boolean
 
     let flagConfig: Partial<FeatureFlag> = {};
 
