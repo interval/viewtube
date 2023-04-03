@@ -7,7 +7,7 @@ export default new Action({
   name: "Upload files",
   unlisted: true,
   handler: async () => {
-    const files = await io.input
+    const { returnValue: files } = await io.input
       .file("Choose files", {
         generatePresignedUrls: async (file) => {
           // We prepend the date to avoid name conflicts. You can of course customize this!
@@ -32,7 +32,8 @@ export default new Action({
           };
         },
       })
-      .multiple();
+      .multiple()
+      .withChoices(["Upload"]);
 
     const dlUrls = await Promise.all(files.map((f) => f.url()));
 
