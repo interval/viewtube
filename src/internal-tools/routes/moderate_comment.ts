@@ -87,38 +87,37 @@ export default new Action({
       Here, we render an io.group w/ the UI to moderate a comment for every comment in our queue.
     */
     for (const comment of commentsToModerate) {
-      const [, decision] = await io.group([
-        io.display.metadata("Comment details", {
-          layout: "list",
-          data: [
-            { label: "Author", value: comment.author.name },
-            { label: "Created", value: comment.createdAt },
-            { label: "Id", value: comment.id },
-            { label: "Content", value: comment.content },
-          ],
-        }),
-        io.select.single("Decision", {
-          options: [
-            {
-              label: "Allow",
-              value: "allow",
-            },
-            {
-              label: "Mark comment as spam",
-              value: "mark-spam",
-            },
-            {
-              label: "Delete comment and ban user",
-              value: "ban",
-            },
-          ],
-        }),
-        io.display.markdown(`
+      const { choice } = await io
+        .group([
+          io.display.metadata("Comment details", {
+            layout: "list",
+            data: [
+              { label: "Author", value: comment.author.name },
+              { label: "Created", value: comment.createdAt },
+              { label: "Id", value: comment.id },
+              { label: "Content", value: comment.content },
+            ],
+          }),
+          io.display.markdown(`
             **Note:** If you choose to ban the user, their account will be scheduled to be permanently deleted from our database. Any videos they uploaded will be marked for deletion.
           `),
-      ]);
-      if (decision.value === "allow") continue;
-      if (decision.value === "ban") {
+        ])
+        .withChoices([
+          {
+            label: "Allow",
+            value: "allow",
+          },
+          {
+            label: "Mark comment as spam",
+            value: "mark-spam",
+          },
+          {
+            label: "Delete comment and ban user",
+            value: "ban",
+          },
+        ]);
+      if (choice === "allow") continue;
+      if (choice === "ban") {
         const isConfirmed = await io.confirm(
           "Are you sure you want to ban this user?",
           {
@@ -134,7 +133,7 @@ export default new Action({
           await banUserByEmail(comment.author.email);
         }
       }
-      if (decision.value === "mark-spam") {
+      if (choice === "mark-spam") {
         await prisma.userComment.update({
           where: {
             id: comment.id,
